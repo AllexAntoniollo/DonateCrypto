@@ -2,12 +2,12 @@
 pragma solidity ^0.8.17;
 
 
-
 contract DonateCrypto{
 
-    address public immutable owner;
+    address payable private immutable owner;
     uint256 public fee = 100;
     uint256 public nextId = 0;
+    mapping(uint256 => Campaign) public campaigns;
 
     struct Campaign{
         address author;
@@ -21,11 +21,11 @@ contract DonateCrypto{
         address[] donors;
     }
 
+
     constructor(){
-        owner = msg.sender;
+        owner = payable(msg.sender);
     }
 
-    mapping(uint256 => Campaign) public campaigns;
 
     function addCampaign(string calldata tittle, string calldata description, string[] calldata videosUrl,string[] calldata imagesUrl, uint256 goal) external {
         Campaign memory newCampaign;
@@ -42,20 +42,22 @@ contract DonateCrypto{
         campaigns[nextId] = newCampaign;
     }
 
+
     function donate(uint256 id) external payable{
         require(msg.value > 0, "You must send a donation value > 0");
         require(campaigns[id].active == true, "Cannot donate to this campaign");
+        
         campaigns[id].donors.push(msg.sender);
         campaigns[id].balance += msg.value;
 
         if (campaigns[id].balance >= campaigns[id].goal){
 
-            address payable recipient = payable(campaigns[id].author);
-            recipient.call{value: campaigns[id].balance - fee}("");
+            payable(campaigns[id].author).transfer(campaigns[id].balance-fee);
 
             campaigns[id].active = false;
         }
     }
+
 
     function withdraw(uint256 id) external{
 
@@ -65,23 +67,22 @@ contract DonateCrypto{
         require(campaign.author == msg.sender, "You do not have permission");
         require(campaign.balance > fee, "This campaign does not have enough balance");
 
-        address payable recipient = payable(campaign.author);
-        recipient.call{value: campaign.balance - fee}("");
+        payable(campaign.author).transfer(campaign.balance-fee);
 
         campaigns[id].active = false;
 
     }
 
+
     function withdrawOwner() external restricted{
-
-        address payable recipient = payable(owner);
-        recipient.call{value: address(this).balance}("");
-
+        owner.transfer(address(this).balance);
     }
+
 
     function changeFee(uint256 newFee) external restricted{
         fee = newFee;
     }
+
 
     modifier restricted(){
         require(owner == msg.sender, "You do not have permission");
