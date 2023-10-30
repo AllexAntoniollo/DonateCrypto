@@ -11,7 +11,7 @@ contract DonateCrypto{
 
     struct Campaign{
         address author;
-        string tittle;
+        string title;
         string description;
         string[] videosUrl;
         string[] imagesUrl;
@@ -27,19 +27,25 @@ contract DonateCrypto{
     }
 
 
-    function addCampaign(string calldata tittle, string calldata description, string[] calldata videosUrl,string[] calldata imagesUrl, uint256 goal) external {
+    function addCampaign(string calldata title, string calldata description, string[] calldata videosUrl,string[] calldata imagesUrl, uint256 goal) external {
         Campaign memory newCampaign;
 
-        newCampaign.tittle = tittle;
+        newCampaign.title = title;
         newCampaign.description = description;
         newCampaign.videosUrl = videosUrl;
         newCampaign.imagesUrl = imagesUrl;
         newCampaign.goal = goal;
         newCampaign.active = true;
         newCampaign.author = msg.sender;
-
-        nextId++;
+        
         campaigns[nextId] = newCampaign;
+        nextId++;
+
+    }
+
+
+    function getDonors(uint256 id) external view returns(address[] memory){
+        return campaigns[id].donors;
     }
 
 
