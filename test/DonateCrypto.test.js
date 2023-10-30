@@ -64,21 +64,6 @@ contract('DonateCrypto', function(accounts) {
   });
 
 
-  //it("Should withdraw owner fees", async () => {
-
-    //await contract.addCampaign(campaign.title,campaign.description,campaign.videosUrl,campaign.imagesUrl,campaign.goal)
-    //await contract.donate(0,{from: accounts[1], value: 1000})
-    //await contract.withdraw(0,{from: accounts[0]})
-
-
-    //await contract.withdrawOwner()
-
-
-//    assert(balance != beforeBalance, "Error")
-
-  //});
-
-
   it("Should change fees", async () => {
 
     initialFee = await contract.fee()

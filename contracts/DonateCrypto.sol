@@ -28,6 +28,7 @@ contract DonateCrypto{
 
 
     function addCampaign(string calldata title, string calldata description, string[] calldata videosUrl,string[] calldata imagesUrl, uint256 goal) external {
+        
         Campaign memory newCampaign;
 
         newCampaign.title = title;
@@ -40,6 +41,7 @@ contract DonateCrypto{
         
         campaigns[nextId] = newCampaign;
         nextId++;
+
 
     }
 
@@ -64,13 +66,10 @@ contract DonateCrypto{
 
     function withdraw(uint256 id) public{
 
-        Campaign storage campaign = campaigns[id];
+        require(campaigns[id].active == true, "This campaign is closed");
+        require(campaigns[id].balance > fee, "This campaign does not have enough balance");
 
-        require(campaign.active == true, "This campaign is closed");
-        require(campaign.author == msg.sender, "You do not have permission");
-        require(campaign.balance > fee, "This campaign does not have enough balance");
-
-        payable(campaign.author).transfer(campaign.balance-fee);
+        payable(campaigns[id].author).transfer(campaigns[id].balance-fee);
 
         campaigns[id].active = false;
 
