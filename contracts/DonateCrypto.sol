@@ -57,15 +57,12 @@ contract DonateCrypto{
         campaigns[id].balance += msg.value;
 
         if (campaigns[id].balance >= campaigns[id].goal){
-
-            payable(campaigns[id].author).transfer(campaigns[id].balance-fee);
-
-            campaigns[id].active = false;
+            withdraw(id);
         }
     }
 
 
-    function withdraw(uint256 id) external{
+    function withdraw(uint256 id) public{
 
         Campaign storage campaign = campaigns[id];
 

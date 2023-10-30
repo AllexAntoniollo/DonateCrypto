@@ -42,14 +42,52 @@ contract('DonateCrypto', function(accounts) {
     assert(campaignAdded.balance == 1000,"Donation is not possible.")
   });
 
-   //it("Should get donor", async () => {
+
+   it("Should get donor", async () => {
+
+    await contract.addCampaign(campaign.title,campaign.description,campaign.videosUrl,campaign.imagesUrl,campaign.goal)
+    await contract.donate(0,{from: accounts[1], value: 1000})
+
+    const donors = await contract.getDonors(0)
+    assert(donors[0] == accounts[1],"Donation is not possible.")
+  });
+
+  
+  it("Should withdraw", async () => {
+
+    await contract.addCampaign(campaign.title,campaign.description,campaign.videosUrl,campaign.imagesUrl,campaign.goal)
+    await contract.donate(0,{from: accounts[1], value: 1000})
+    await contract.withdraw(0,{from: accounts[0]})
+
+    const campaignAdded = await contract.campaigns(0)
+    assert(campaignAdded.active == false,"The campaign is not closed.")
+  });
+
+
+  //it("Should withdraw owner fees", async () => {
 
     //await contract.addCampaign(campaign.title,campaign.description,campaign.videosUrl,campaign.imagesUrl,campaign.goal)
     //await contract.donate(0,{from: accounts[1], value: 1000})
+    //await contract.withdraw(0,{from: accounts[0]})
 
-    //const campaignAdded = await contract.campaigns(0)
-   // assert(campaignAdded.donors[0] == accounts[1],"Donation is not possible.")
+
+    //await contract.withdrawOwner()
+
+
+//    assert(balance != beforeBalance, "Error")
+
   //});
+
+
+  it("Should change fees", async () => {
+
+    initialFee = await contract.fee()
+    contract.changeFee(200)
+    fee = await contract.fee()
+
+    assert(initialFee != fee, "It was not possible to change the fee.")
+
+  });
 
   
 });
