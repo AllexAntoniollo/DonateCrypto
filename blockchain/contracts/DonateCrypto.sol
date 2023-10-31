@@ -4,9 +4,10 @@ pragma solidity ^0.8.17;
 
 contract DonateCrypto{
 
-    address payable private immutable owner;
+    address payable public immutable owner;
     uint256 public fee = 100;
     uint256 public nextId = 0;
+    uint256 public feesGenerated = 0;
     mapping(uint256 => Campaign) public campaigns;
 
     struct Campaign{
@@ -70,6 +71,7 @@ contract DonateCrypto{
         require(campaigns[id].balance > fee, "This campaign does not have enough balance");
 
         payable(campaigns[id].author).transfer(campaigns[id].balance-fee);
+        feesGenerated += fee;
 
         campaigns[id].active = false;
 
@@ -77,7 +79,9 @@ contract DonateCrypto{
 
 
     function withdrawOwner() external restricted{
-        owner.transfer(address(this).balance);
+        require(feesGenerated > 0, "No fees to withdraw");
+        owner.transfer(feesGenerated);
+        feesGenerated = 0;
     }
 
 

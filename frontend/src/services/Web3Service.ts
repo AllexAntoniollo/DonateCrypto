@@ -1,12 +1,24 @@
 import Web3 from "web3";
 import ABI  from "./ABI.json";
+import { Contract } from "web3-eth-contract";
 
-const CONTRACT_ADDRESS = "0x1f975D052Ad6BD86a9Ee88B86b3C18B68B0Ec367";
+const CONTRACT_ADDRESS = "0xd33d635962A3988D68A06dEdAE72519ce5661832";
+
+
+
+function getWeb3(): Web3 {
+    if (!window.ethereum) throw new Error(`No MetaMask found.`);
+    return new Web3(window.ethereum);
+}
+
+function getContract(web3? : Web3) : Contract<Abi> {
+    if (!web3) web3 = getWeb3();
+    return new web3.eth.Contract(ABI, CONTRACT_ADDRESS, { from: localStorage.getItem("wallet") || undefined });
+}
+
 
 export async function doLogin() {
-    if (!window.ethereum) throw new Error("No MetaMask found!");
-        
-    const web3 = new Web3(window.ethereum);
+    const web3 = getWeb3()
     const account = await web3.eth.requestAccounts();
     if (!account || !account.length) throw new Error("Wallet not found/allowed.");   
     
@@ -14,12 +26,6 @@ export async function doLogin() {
 
     return account[0];
 }
-
-function getContract() {
-    const web3 = new Web3(window.ethereum);
-    return new web3.eth.Contract(ABI, CONTRACT_ADDRESS, { from: localStorage.getItem("wallet") || undefined });
-}
-
 
 export function getLastCampaignId(){
     const contract = getContract();
