@@ -1,15 +1,17 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import "./IDonateCrypto.sol";
 
-contract DonateCrypto{
+
+contract DonateCrypto is IDonateCrypto{
+
 
     address payable public immutable owner;
     uint256 public fee = 100;
     uint256 public nextId = 0;
     uint256 public feesGenerated = 0;
     mapping(uint256 => Campaign) public campaigns;
-
     struct Campaign{
         address author;
         string title;
@@ -29,7 +31,6 @@ contract DonateCrypto{
 
 
     function addCampaign(string calldata title, string calldata description, string[] calldata videosUrl,string[] calldata imagesUrl, uint256 goal) external {
-        
         Campaign memory newCampaign;
 
         newCampaign.title = title;
@@ -38,11 +39,10 @@ contract DonateCrypto{
         newCampaign.imagesUrl = imagesUrl;
         newCampaign.goal = goal;
         newCampaign.active = true;
-        newCampaign.author = msg.sender;
+        newCampaign.author = tx.origin;
         
         campaigns[nextId] = newCampaign;
         nextId++;
-
 
     }
 
@@ -56,7 +56,7 @@ contract DonateCrypto{
         require(msg.value > 0, "You must send a donation value > 0");
         require(campaigns[id].active == true, "Cannot donate to this campaign");
         
-        campaigns[id].donors.push(msg.sender);
+        campaigns[id].donors.push(tx.origin);
         campaigns[id].balance += msg.value;
 
         if (campaigns[id].balance >= campaigns[id].goal){
@@ -66,15 +66,12 @@ contract DonateCrypto{
 
 
     function withdraw(uint256 id) public{
-
         require(campaigns[id].active == true, "This campaign is closed");
         require(campaigns[id].balance > fee, "This campaign does not have enough balance");
 
         payable(campaigns[id].author).transfer(campaigns[id].balance-fee);
         feesGenerated += fee;
-
         campaigns[id].active = false;
-
     }
 
 
@@ -91,7 +88,7 @@ contract DonateCrypto{
 
 
     modifier restricted(){
-        require(owner == msg.sender, "You do not have permission");
+        require(owner == tx.origin, "You do not have permission");
         _;
     }
 
