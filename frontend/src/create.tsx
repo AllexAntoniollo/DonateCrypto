@@ -1,32 +1,32 @@
 import { Link } from "react-router-dom";
 import Footer from "./components/Footer"
-import { addCampaign, getLastCampaignId } from './services/Web3Service';
-
+import { Campaign, getLastCampaignId } from './services/Web3Service';
+import { ChangeEvent } from 'react';
 import { useState } from "react"
 export default function Create(){
 
-    const [campaign,setCampaign] = useState({});
+    const [campaign,setCampaign] = useState<Campaign>({} as Campaign);
     const [message,setMessage] = useState("");
 
-    function onInputChange(evt) {
+    function onInputChange(evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
         setCampaign(prevState => ({...prevState, [evt.target.id]: evt.target.value}))
     }
 
     function btnSaveClick() {
         setMessage("Salvando...Aguarde...");
-        addCampaign(campaign)
+       /* addCampaign(campaign)
             .then(tx => getLastCampaignId())
             .then(id => setMessage(`Campanha salva com ID ${id}. Avise seus amigos e passe a eles esse número.`))
             .catch(err => {
                 console.error(err);
                 setMessage(err.message)
-            })
+            })*/
     }
 
     return(
         <>
             <div className="container">
-            <h1 className='display-5 fw-bold lh-1 mb-3' style={{ color: "#333", fontFamily: "Euclid Circular B, sans-serif" }}>Donate Crypto</h1>
+            <h1 className='display-5 fw-bold lh-1 mt-3 mb-3' style={{ color: "#333", fontFamily: "Euclid Circular B, sans-serif" }}>Donate Crypto</h1>
                 <p style={{ color: "#333", fontFamily: "Euclid Circular B, sans-serif" }}>Fill in the fields to include your campaign on the platform.</p>
                 <hr className="mb-4"></hr>
                 <div className="col-6">
@@ -35,22 +35,22 @@ export default function Create(){
                         <label htmlFor="title">Title:</label>
                     </div>
                     <div className="form-floating mb-3">
-                        <textarea id="description" className="form-control"value={campaign.description} onChange={onInputChange}></textarea>
+                    <textarea id="description" className="form-control" defaultValue={campaign.description} onChange={onInputChange}></textarea>
                         <label htmlFor="description">Description:</label>
                     </div>
 
                     <div className="form-floating mb-3">
-                        <input id="imagesUrls" className="form-control"value={campaign.imagesUrls} onChange={onInputChange}></input>
+                        <input id="imagesUrls" className="form-control" value={campaign.imagesUrls} onChange={onInputChange}></input>
                         <label htmlFor="imagesUrls">Images Urls:</label>
                     </div>
                     <div className="form-floating mb-3">
-                        <input id="videosUrls" className="form-control"value={campaign.videosUrls} onChange={onInputChange}></input>
+                        <input id="videosUrls" className="form-control" value={campaign.videosUrls || ""} onChange={onInputChange}></input>
                         <label htmlFor="videosUrls">Videos Urls:</label>
                     </div>
         
 
                     <div className="form-floating mb-3">
-                        <input type="number" id="goal" className="form-control"value={campaign.goal} onChange={onInputChange}></input>
+                        <input min="100" type="number" id="goal" className="form-control" value={campaign.goal} onChange={onInputChange}></input>
                         <label htmlFor="goal">Goals:</label>
                     </div>
                     

@@ -1,48 +1,47 @@
-import { Link } from "react-router-dom";
 import Footer from "./components/Footer"
-import { getCampaign, donate } from './services/Web3Service';
+import { Campaign, getCampaign } from './services/Web3Service';
 
 
 import { useState } from "react"
 export default function Donate(){
 
-    const [campaign,setCampaign] = useState({});
+    const [campaign,setCampaign] = useState<Campaign>({} as Campaign);
     const [donation,setDonation] = useState("");
     const [message,setMessage] = useState("");
 
 
     function btnSearchClick() {
         setMessage("Buscando...Aguarde...");
-        getCampaign(campaign.id)
+        getCampaign(campaign.id || "")
         .then(result => {
             setMessage("");
             result.id = campaign.id;
             setCampaign(result);
         })
-       // .catch(err => setMessage(err.message));
+        .catch(err => setMessage(err.message));
 
     }
 
-    function onChangeId(evt) {
+    function onChangeId(evt : React.ChangeEvent<HTMLInputElement>) {
         campaign.id = evt.target.value;
     }
 
-    function onChangeValue(evt) {
+    function onChangeValue(evt : React.ChangeEvent<HTMLInputElement>) {
         setDonation(evt.target.value);
     }
     
     function btnDonateClick() {
-        setMessage("Doando...Aguarde...");
+        setMessage("Doando...Aguarde...");/*
         donate(campaign.id, donation)
             .then(tx => setMessage("Doação realizada, obigado. Em alguns minutos o saldo será atualizado."))
-            .catch(err => setMessage(err.message))
+            .catch(err => setMessage(err.message))*/
 
     }
 
     return(
         <>
             <div className="container">
-            <h1 className='display-5 fw-bold lh-1 mb-3' style={{ color: "#333", fontFamily: "Euclid Circular B, sans-serif" }}>Donate Crypto</h1>
+            <h1 className='display-5 fw-bold lh-1 mb-3 mt-3' style={{ color: "#333", fontFamily: "Euclid Circular B, sans-serif" }}>Donate Crypto</h1>
 
             {
                 !campaign.id
@@ -67,24 +66,24 @@ export default function Donate(){
                         <div className="col-7">
                             {
                                 
-                                campaign.videosUrl
-                                ?<iframe width='100%' height='480' src={campaign.videosUrl[0]}></iframe>
+                                campaign.videosUrls
+                                ?<iframe width='100%' height='480' src={campaign.videosUrls[0]}></iframe>
                                 :<></>//<img src={campaign.imagesUrl[0]} className="d-block mx-lg-auto img-fluid" width="640" height="480"></img>
                             }
 
 
                         </div>
-                        <div className="col-5 mb-5 " style={{height: 480, scrollbars: true}}>
+                        <div className="col-5 mb-5 " style={{height: 480, overflow: "auto"}}>
                             <h2>Title: {campaign.title}</h2>
                             <p><strong>Autor: </strong>{campaign.author}</p>
                             <p className="mb-3">Description: {campaign.description}</p>
                             {
-                                campaign.videosUrl
+                                campaign.videosUrls
                                 ?<p>Assista ao video ao lado para entender mais sobre nossa campanha.</p>
                                 :<></>
 
                             }
-                            <p className="mb-3 fst-italic mt-5">E aí, o que achou do projeto? Já foi arrecadado {campaign.balance / 10**18} ETH nesta campanha. O quanto você quer doar (em ETH)?</p>
+                            <p className="mb-3 fst-italic mt-5">E aí, o que achou do projeto? Já foi arrecadado {Number(campaign.balance) / 10**18} ETH nesta campanha. O quanto você quer doar (em ETH)?</p>
 
                         </div>
                         <div className="mb-3">

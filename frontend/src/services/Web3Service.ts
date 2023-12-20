@@ -1,57 +1,69 @@
-import Web3 from "web3";
 import ABI  from "./ABI.json";
-import { Contract } from "web3-eth-contract";
-
-const CONTRACT_ADDRESS = "0xd33d635962A3988D68A06dEdAE72519ce5661832";
+import { ethers } from 'ethers';
 
 
+const ADAPTER_ADDRESS = `${process.env.REACT_APP_ADAPTER_ADDRESS}`;
 
-function getWeb3(): Web3 {
-    if (!window.ethereum) throw new Error(`No MetaMask found.`);
-    return new Web3(window.ethereum);
+
+
+function getProvider(): ethers.BrowserProvider {
+    if (!window.ethereum) throw new Error("No MetaMask found");
+    return new ethers.BrowserProvider(window.ethereum);
 }
 
-function getContract(web3? : Web3) : Contract<Abi> {
-    if (!web3) web3 = getWeb3();
-    return new web3.eth.Contract(ABI, CONTRACT_ADDRESS, { from: localStorage.getItem("wallet") || undefined });
+function getContract(provider?: ethers.BrowserProvider): ethers.Contract {
+    if (!provider) provider = getProvider();
+    return new ethers.Contract(ADAPTER_ADDRESS, ABI as ethers.InterfaceAbi, provider);
+}
+
+async function getContractSigner(provider?: ethers.BrowserProvider): Promise<ethers.Contract> {
+    if (!provider) provider = getProvider();
+    const signer = await provider.getSigner(localStorage.getItem("account") || undefined);
+    const contract = new ethers.Contract(ADAPTER_ADDRESS, ABI as ethers.InterfaceAbi, provider);
+    return contract.connect(signer) as ethers.Contract;
 }
 
 
 export async function doLogin() {
-    const web3 = getWeb3()
-    const account = await web3.eth.requestAccounts();
+    const provider = getProvider()
+    const account = await provider.send("eth_requestAccounts", []);
+
     if (!account || !account.length) throw new Error("Wallet not found/allowed.");   
     
     localStorage.setItem("wallet", account[0]);
 
-    return account[0];
+    return account[0]
+    
 }
 
 export function getLastCampaignId(){
     const contract = getContract();
-    return contract.methods.nextId().call();
+    return contract.nextId();
 }
-
+/*
 export function addCampaign(campaign : Campaign){
     const contract = getContract();
-    return contract.methods.addCampaign(campaign.title, campaign.description, campaign.videosUrl, campaign.imagesUrl, campaign.goal).send();
-}
+    return contract.addCampaign(campaign.title, campaign.description, campaign.videosUrl, campaign.imagesUrl, campaign.goal).send();
+}*/
 
 export function getCampaign(id : string) {
     const contract = getContract();
-    return contract.methods.campaigns(id).call();
+    return contract.campaigns(id);
 }
+/*
+export async function donate(id : string, donation : string) {
+    const contract = await getContractSigner();
+    return contract.donate(id).send({value: Web3.utils.toWei(donation, "ether")});
 
-export function donate(id : string, donation : string) {
-    const contract = getContract();
-    return contract.methods.donate(id).send({value: Web3.utils.toWei(donation, "ether")});
-
-}
+}*/
 
 export type Campaign = {
+    id? : string
     title?: string;
     description?: string;
-    videosUrl?: string[];
-    imagesUrl?: string[];
+    videosUrls?: string[];
+    imagesUrls?: string[];
     goal?: string;
+    author?: string;
+    balance?: BigInt;
 }

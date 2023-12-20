@@ -5,10 +5,9 @@ import "solidity-coverage";
 import dotenv from 'dotenv';
 dotenv.config();
 
-
 const config: HardhatUserConfig = {
   solidity: {
-    version: "0.8.17",
+    version: "0.8.20",
     settings: {
       optimizer: {
         enabled: true,
@@ -24,10 +23,16 @@ const config: HardhatUserConfig = {
         mnemonic: process.env.SECRET
       }
     },
+    localganache:{
+      url: process.env.PROVIDER_URL,
+      accounts: [`${process.env.PRIVATE_KEY}`]
+    }
   },
   etherscan: {
     apiKey: process.env.API_KEY
-  }
-};
+  },
+
+}
+
 
 export default config;

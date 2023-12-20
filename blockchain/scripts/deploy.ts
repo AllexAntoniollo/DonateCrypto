@@ -1,18 +1,30 @@
 import { ethers } from "hardhat";
 
 async function main() {
-
-  const DonateCrypto = await ethers.deployContract("DonateCrypto");
-
-  await DonateCrypto.waitForDeployment();
-
-  console.log(await DonateCrypto.getAddress());
   
+  
+  const DonateCrypto = await ethers.getContractFactory("DonateCrypto");
 
+  const contract = await DonateCrypto.deploy();
+  console.log(1);
+  
+  await contract.waitForDeployment();
+  console.log(2);
+
+  const contractAddress = await contract.getAddress();
+  console.log(`Contract deployed to: ${contractAddress}`);
+
+  const DonateCryptoAdapter = await ethers.getContractFactory("DonateCryptoAdapter");
+  const adapter = await DonateCryptoAdapter.deploy();
+
+  await adapter.waitForDeployment();
+  const adapterAddress = await adapter.getAddress();
+  console.log(`DonateCryptoAdapter deployed to: ${adapterAddress}`);
+
+  await adapter.upgrade(contractAddress);
+  console.log(`DonateCryptoAdapter upgraded to: ${contractAddress}`);
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
 main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
