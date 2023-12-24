@@ -19,6 +19,7 @@ function Router() {
         <BrowserRouter>
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/about" element={<Home />} />
 
                 <Route path="/donate" element={
                     <PrivateRoute>

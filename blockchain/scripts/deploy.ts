@@ -6,10 +6,8 @@ async function main() {
   const DonateCrypto = await ethers.getContractFactory("DonateCrypto");
 
   const contract = await DonateCrypto.deploy();
-  console.log(1);
   
   await contract.waitForDeployment();
-  console.log(2);
 
   const contractAddress = await contract.getAddress();
   console.log(`Contract deployed to: ${contractAddress}`);

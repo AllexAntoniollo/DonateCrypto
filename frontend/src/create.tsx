@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import Footer from "./components/Footer"
-import { Campaign, getLastCampaignId } from './services/Web3Service';
+import { Campaign, getLastCampaignId, addCampaign } from './services/Web3Service';
 import { ChangeEvent } from 'react';
 import { useState } from "react"
 export default function Create(){
@@ -8,19 +8,28 @@ export default function Create(){
     const [campaign,setCampaign] = useState<Campaign>({} as Campaign);
     const [message,setMessage] = useState("");
 
+
     function onInputChange(evt: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-        setCampaign(prevState => ({...prevState, [evt.target.id]: evt.target.value}))
+        const { id, value } = evt.target;
+        
+        setCampaign((prevState) => ({
+            ...prevState,
+            [id]: id === "imagesUrl" || id === "videosUrl" ? value.split(",") : value,
+        }));
     }
 
     function btnSaveClick() {
         setMessage("Salvando...Aguarde...");
-       /* addCampaign(campaign)
+
+        addCampaign(campaign)
             .then(tx => getLastCampaignId())
-            .then(id => setMessage(`Campanha salva com ID ${id}. Avise seus amigos e passe a eles esse número.`))
+            .then(id => {setMessage(`Campanha salva com ID ${id}. Avise seus amigos e passe a eles esse número.`)
+                    
+            })
             .catch(err => {
                 console.error(err);
                 setMessage(err.message)
-            })*/
+            })
     }
 
     return(
@@ -40,12 +49,12 @@ export default function Create(){
                     </div>
 
                     <div className="form-floating mb-3">
-                        <input id="imagesUrls" className="form-control" value={campaign.imagesUrls} onChange={onInputChange}></input>
-                        <label htmlFor="imagesUrls">Images Urls:</label>
+                        <input id="imagesUrl" className="form-control" value={campaign.imagesUrl.join(",")} onChange={onInputChange}></input>
+                        <label htmlFor="imagesUrl">Images Urls:</label>
                     </div>
                     <div className="form-floating mb-3">
-                        <input id="videosUrls" className="form-control" value={campaign.videosUrls || ""} onChange={onInputChange}></input>
-                        <label htmlFor="videosUrls">Videos Urls:</label>
+                        <input id="videosUrl" className="form-control" value={campaign.videosUrl.join(",")} onChange={onInputChange}></input>
+                        <label htmlFor="videosUrl">Videos Urls:</label>
                     </div>
         
 

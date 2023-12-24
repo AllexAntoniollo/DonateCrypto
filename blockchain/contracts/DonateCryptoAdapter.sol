@@ -1,7 +1,9 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.19;
 
 import "./IDonateCrypto.sol";
+
+import {DonateCryptoLib as Lib} from "./DonateCryptoLib.sol";
 
 
 contract DonateCryptoAdapter {
@@ -17,10 +19,21 @@ contract DonateCryptoAdapter {
     function getImplAddress() external view returns (address) {
         return address(implementation);
     }
+    
 
     function upgrade(address newImplementation) external{
         require(msg.sender == owner,"You do not have permission");
         implementation = IDonateCrypto(newImplementation);
+    }
+
+
+    function getCampaign(uint256 id) external view returns(Lib.Campaign memory){
+        return implementation.getCampaign(id);
+    }
+
+
+    function getLastId() external view returns(uint256){
+        return implementation.getLastId();
     }
 
 

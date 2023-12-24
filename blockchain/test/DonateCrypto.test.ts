@@ -35,6 +35,22 @@ describe("DonateCrypto", function () {
       expect(await contract.nextId()).to.equal(1);
     });
 
+    it("Should get campaign", async function () {
+      const { contract} = await loadFixture(deployFixture);
+
+      await contract.addCampaign(campaign.title,campaign.description,campaign.videosUrl,campaign.imagesUrl,campaign.goal)
+      const result = await contract.getCampaign(0)      
+      expect(await result.title).to.equal("Meal of Love");
+    });
+
+    it("Should get last id", async function () {
+      const { contract} = await loadFixture(deployFixture);
+
+      await contract.addCampaign(campaign.title,campaign.description,campaign.videosUrl,campaign.imagesUrl,campaign.goal)
+      const lastId = await contract.getLastId()
+      expect(await lastId).to.equal(1);
+    });
+
 
     it("Should make a donation", async function () {
       const { contract,otherAccount} = await loadFixture(deployFixture);

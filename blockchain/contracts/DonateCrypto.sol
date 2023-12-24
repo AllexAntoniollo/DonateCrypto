@@ -1,7 +1,9 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.19;
 
 import "./IDonateCrypto.sol";
+
+import {DonateCryptoLib as Lib} from "./DonateCryptoLib.sol";
 
 
 contract DonateCrypto is IDonateCrypto{
@@ -11,27 +13,25 @@ contract DonateCrypto is IDonateCrypto{
     uint256 public fee = 100;
     uint256 public nextId = 0;
     uint256 public feesGenerated = 0;
-    mapping(uint256 => Campaign) public campaigns;
-    struct Campaign{
-        address author;
-        string title;
-        string description;
-        string[] videosUrl;
-        string[] imagesUrl;
-        uint256 balance;
-        uint256 goal;
-        bool active;
-        address[] donors;
-    }
+    Lib.Campaign[] public campaigns;
 
 
     constructor(){
         owner = payable(msg.sender);
     }
 
+    function getCampaign(uint256 id) external view returns (Lib.Campaign memory) {
+        return campaigns[id];
+    }
+    
+
+    function getLastId() external view returns(uint256){
+        return nextId;
+    }
+
 
     function addCampaign(string calldata title, string calldata description, string[] calldata videosUrl,string[] calldata imagesUrl, uint256 goal) external {
-        Campaign memory newCampaign;
+        Lib.Campaign memory newCampaign;
 
         newCampaign.title = title;
         newCampaign.description = description;
@@ -41,7 +41,7 @@ contract DonateCrypto is IDonateCrypto{
         newCampaign.active = true;
         newCampaign.author = tx.origin;
         
-        campaigns[nextId] = newCampaign;
+        campaigns.push(newCampaign);
         nextId++;
 
     }
@@ -69,15 +69,16 @@ contract DonateCrypto is IDonateCrypto{
         require(campaigns[id].active == true, "This campaign is closed");
         require(campaigns[id].balance > fee, "This campaign does not have enough balance");
 
-        payable(campaigns[id].author).transfer(campaigns[id].balance-fee);
         feesGenerated += fee;
         campaigns[id].active = false;
+        payable(campaigns[id].author).transfer(campaigns[id].balance-fee);
+
     }
 
 
     function withdrawOwner() external restricted{
         require(feesGenerated > 0, "No fees to withdraw");
-        owner.transfer(feesGenerated);
+        payable(owner).transfer(feesGenerated);
         feesGenerated = 0;
     }
 

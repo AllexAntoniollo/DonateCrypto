@@ -4,7 +4,7 @@ import {
   import { expect } from "chai";
   import { ethers } from "hardhat";
   
-  describe("DonateCrypto", function () {
+  describe("DonateCryptoAdapter", function () {
   
   
       async function deployAdapterFixture(){
@@ -69,6 +69,32 @@ import {
         expect(await contract.nextId()).to.equal(1);
       });
 
+      it("Should get campaign", async function () {
+        const { adapter } = await loadFixture(deployAdapterFixture);
+        const { contract } = await loadFixture(deployImplementationFixture);
+
+        await adapter.upgrade(await contract.getAddress());
+
+        await adapter.addCampaign(campaign.title,campaign.description,campaign.videosUrl,campaign.imagesUrl,campaign.goal);
+        const result = adapter.getCampaign(0)
+        
+        expect((await result).title).to.equal("Meal of Love");
+      });
+
+
+      it("Should get last id", async function () {
+        const { adapter } = await loadFixture(deployAdapterFixture);
+        const { contract } = await loadFixture(deployImplementationFixture);
+
+        await adapter.upgrade(await contract.getAddress());
+
+        await adapter.addCampaign(campaign.title,campaign.description,campaign.videosUrl,campaign.imagesUrl,campaign.goal);
+        
+        expect(await adapter.getLastId()).to.equal(1);
+      });
+
+
+
 
       it("Should make a donation", async function () {
         const { adapter, otherAccount } = await loadFixture(deployAdapterFixture);
@@ -125,19 +151,30 @@ import {
         await expect(instance.changeFee(200)).to.be.revertedWith("You do not have permission")
       });
 
+      
       it("Should owner withdraw", async function () {
         const { adapter, otherAccount } = await loadFixture(deployAdapterFixture);
         const { contract } = await loadFixture(deployImplementationFixture);
-
+    
         await adapter.upgrade(await contract.getAddress());
-
-        await adapter.addCampaign(campaign.title,campaign.description,campaign.videosUrl,campaign.imagesUrl,campaign.goal);
-        
+    
+        await adapter.addCampaign(campaign.title, campaign.description, campaign.videosUrl, campaign.imagesUrl, campaign.goal);
+    
         const instance = await adapter.connect(otherAccount)
-        await instance.donate("0",{value: 11000})        
-
-        expect(await contract.feesGenerated()).to.equal(100)
-      });
+        await instance.donate("0", { value: 11000 })
+    
+        const contractAddress = await contract.getAddress();
+    
+        const contractBalanceBefore = await ethers.provider.getBalance(contractAddress);
+        
+    
+        await adapter.withdrawOwner()
+    
+        const contractBalanceAfter = await ethers.provider.getBalance(contractAddress);
+        
+        expect(contractBalanceAfter).to.equal(Number(contractBalanceBefore) - 100);
+    });
+    
 
 
 

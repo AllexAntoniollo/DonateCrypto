@@ -1,5 +1,7 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.19;
+
+import {DonateCryptoLib as Lib} from "./DonateCryptoLib.sol";
 
 interface IDonateCrypto {
     
@@ -7,10 +9,15 @@ interface IDonateCrypto {
 
     function getDonors(uint256 id) external view returns(address[] memory);
 
+    function getLastId() external view returns(uint256);
+
     function donate(uint256 id) external payable;
 
     function withdrawOwner() external;
 
     function changeFee(uint256 newFee) external;
+
+    function getCampaign(uint256 id) external view returns(Lib.Campaign memory);
+
     
 }

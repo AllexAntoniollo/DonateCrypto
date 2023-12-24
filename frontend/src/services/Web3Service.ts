@@ -5,7 +5,6 @@ import { ethers } from 'ethers';
 const ADAPTER_ADDRESS = `${process.env.REACT_APP_ADAPTER_ADDRESS}`;
 
 
-
 function getProvider(): ethers.BrowserProvider {
     if (!window.ethereum) throw new Error("No MetaMask found");
     return new ethers.BrowserProvider(window.ethereum);
@@ -18,9 +17,14 @@ function getContract(provider?: ethers.BrowserProvider): ethers.Contract {
 
 async function getContractSigner(provider?: ethers.BrowserProvider): Promise<ethers.Contract> {
     if (!provider) provider = getProvider();
-    const signer = await provider.getSigner(localStorage.getItem("account") || undefined);
+    const signer = await provider.getSigner(localStorage.getItem("wallet") || undefined);
     const contract = new ethers.Contract(ADAPTER_ADDRESS, ABI as ethers.InterfaceAbi, provider);
     return contract.connect(signer) as ethers.Contract;
+}
+
+export async function upgrade(address: string): Promise<ethers.Transaction> {
+    const contract = await getContractSigner();
+    return contract.upgrade(address) as Promise<ethers.Transaction>;
 }
 
 
@@ -38,32 +42,34 @@ export async function doLogin() {
 
 export function getLastCampaignId(){
     const contract = getContract();
-    return contract.nextId();
+    return contract.getLastId();
 }
-/*
-export function addCampaign(campaign : Campaign){
-    const contract = getContract();
-    return contract.addCampaign(campaign.title, campaign.description, campaign.videosUrl, campaign.imagesUrl, campaign.goal).send();
-}*/
 
-export function getCampaign(id : string) {
-    const contract = getContract();
-    return contract.campaigns(id);
-}
-/*
-export async function donate(id : string, donation : string) {
+export async function addCampaign(campaign : Campaign){
     const contract = await getContractSigner();
-    return contract.donate(id).send({value: Web3.utils.toWei(donation, "ether")});
+    return contract.addCampaign(campaign.title, campaign.description, campaign.videosUrl, campaign.imagesUrl, campaign.goal)  as Promise<ethers.Transaction>;;
+}
 
-}*/
+export async function getCampaign(id : number) {
+    
+    const contract = getContract();
+    return contract.getCampaign(id);
+}
+
+export async function donate(id : number, donation : string) : Promise<ethers.Transaction> {
+    const contract = await getContractSigner();
+    const value = ethers.toBigInt(donation)
+    return contract.donate(id, {value}) as Promise<ethers.Transaction>
+}
 
 export type Campaign = {
-    id? : string
-    title?: string;
-    description?: string;
-    videosUrls?: string[];
-    imagesUrls?: string[];
-    goal?: string;
-    author?: string;
-    balance?: BigInt;
+    title: string;
+    description: string;
+    videosUrl: string[];
+    imagesUrl: string[];
+    goal: string;
+    author: string;
+    balance: BigInt;
+    donors: string[];
+    active: boolean;
 }
