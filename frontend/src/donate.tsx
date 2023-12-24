@@ -1,8 +1,9 @@
+import { ethers } from "ethers";
 import Footer from "./components/Footer"
 import { Campaign, getCampaign, donate } from './services/Web3Service';
 
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 export default function Donate(){
 
     const [id,setId] = useState<number>();
@@ -12,9 +13,6 @@ export default function Donate(){
 
     
 
-    useEffect(() => {
-        console.log("Component re-rendered with campaign:", campaign.active);
-      }, [campaign]);
 
       
 
@@ -82,15 +80,14 @@ export default function Donate(){
                     <p>Verifique se esta é a campanha certa antes de finalizar a doação.</p>
                     <hr />
                     <div className="row flex-lg-row-reverse align-items-center g-5">
-                        <div className="col-7">
+                        <div className="col-5">
                             {
-                                                                //<iframe width='100%' title={campaign.title} height='480' src={campaign.videosUrls[0]}></iframe>
                             
                 
                                 (campaign.imagesUrl && campaign.imagesUrl.length > 0)
                                 ?                     <>
                                 {campaign.imagesUrl.map(item => (
-                                    <img src={item} className="d-block mx-lg-auto img-fluid" alt={item}></img>
+                                    <img src={item} className="d-block mx-lg-auto img-fluid mt-4" alt={item} width={300}></img>
                                 ))}
                               </>
                                 :<></>
@@ -100,30 +97,45 @@ export default function Donate(){
 
 
                         </div>
-                        <div className="col-5 mb-5 " style={{height: 480, overflow: "auto"}}>
+                        <div className="col-7 mb-5 " style={{height: 500, overflow: "auto"}}>
                             <h2>Title: {campaign.title}</h2>
-                            <p><strong>Autor: </strong>{campaign.author}</p>
+                            <p><strong>Author: </strong>{campaign.author}</p>
                             <p className="mb-3">Description: {campaign.description}</p>
                             {
+
                                 campaign.videosUrl
-                                ?<p>Assista ao video ao lado para entender mais sobre nossa campanha.</p>
+                                ?<>
+                                {campaign.videosUrl.map(item => (
+                                    <iframe allowFullScreen style={{width: "100%", minHeight: "300px"}} className="mt-3" title={campaign.title} src={item}></iframe>
+                                    ))}
+                              </>
                                 :<></>
 
                             }
-                            <p className="mb-3">Goal: {Number(campaign.goal)}</p>
+                            <p className="mb-3 fw-bold">Goal: {ethers.formatEther(campaign.goal)} ETH</p>
                             <p className="mb-3">Active: {campaign.active ? "This campaign is active." : "This campaign is closed."}</p>
-                            <p className="mb-3">Donors: {campaign.donors}</p>
 
 
+                            <p className="mb-3 fst-italic mt-5">E aí, o que achou do projeto? Já foi arrecadado {ethers.formatEther(campaign.balance)} ETH nesta campanha. O quanto você quer doar (em ETH)?</p>
 
-                            <p className="mb-3 fst-italic mt-5">E aí, o que achou do projeto? Já foi arrecadado {Number(campaign.balance)} WEI nesta campanha. O quanto você quer doar (em ETH)?</p>
+                            <p className="mb-3">Donors: {campaign.donors
+                                                        ? <>
+                                                        {campaign.donors.map((item, index) => (
+                                                            <p key={index}>#{index + 1} - {item}</p>
+                                                        ))}
+                                                        </>
+                                                        : <></>
+                            
+                            }
+                            
+                            </p>
 
                         </div>
                         <div className="mb-3">
                             <div className="input-group">
-                                <input type="number" id="donation" className="form-control" onChange={onChangeValue} value={donation}/>
+                                <input disabled={!campaign.active} type="number" id="donation" className="form-control" onChange={onChangeValue} value={donation}/>
                                 <span className="input-group-text">ETH</span>
-                                <input type="button" value="Donate" className="btn btn-primary p-3 w-25" onClick={btnDonateClick}/>
+                                <input disabled={!campaign.active} type="button" value="Donate" className="btn btn-primary p-3 w-25" onClick={btnDonateClick}/>
                             </div>
                         </div>
                     </div>

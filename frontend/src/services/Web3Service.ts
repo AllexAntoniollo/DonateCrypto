@@ -1,5 +1,5 @@
 import ABI  from "./ABI.json";
-import { ethers } from 'ethers';
+import { BigNumberish, ethers } from 'ethers';
 
 
 const ADAPTER_ADDRESS = `${process.env.REACT_APP_ADAPTER_ADDRESS}`;
@@ -58,7 +58,7 @@ export async function getCampaign(id : number) {
 
 export async function donate(id : number, donation : string) : Promise<ethers.Transaction> {
     const contract = await getContractSigner();
-    const value = ethers.toBigInt(donation)
+    const value = ethers.parseEther(donation)
     return contract.donate(id, {value}) as Promise<ethers.Transaction>
 }
 
@@ -67,9 +67,9 @@ export type Campaign = {
     description: string;
     videosUrl: string[];
     imagesUrl: string[];
-    goal: BigInt;
+    goal: BigNumberish;
     author: string;
-    balance: BigInt;
+    balance: BigNumberish;
     donors: string[];
     active: boolean;
 }
