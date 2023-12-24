@@ -13,7 +13,7 @@ export default function Donate(){
     
 
     useEffect(() => {
-        console.log("Component re-rendered with campaign:", campaign);
+        console.log("Component re-rendered with campaign:", campaign.active);
       }, [campaign]);
 
       
@@ -110,8 +110,8 @@ export default function Donate(){
                                 :<></>
 
                             }
-                            <p className="mb-3">Goal: {campaign.goal}</p>
-                            <p className="mb-3">Active: {campaign.active}</p>
+                            <p className="mb-3">Goal: {Number(campaign.goal)}</p>
+                            <p className="mb-3">Active: {campaign.active ? "This campaign is active." : "This campaign is closed."}</p>
                             <p className="mb-3">Donors: {campaign.donors}</p>
 
 

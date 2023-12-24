@@ -59,7 +59,7 @@ export default function Create(){
         
 
                     <div className="form-floating mb-3">
-                        <input min="100" type="number" id="goal" className="form-control" value={campaign.goal} onChange={onInputChange}></input>
+                        <input min="100" type="number" id="goal" className="form-control" value={Number(campaign.goal)} onChange={onInputChange}></input>
                         <label htmlFor="goal">Goals:</label>
                     </div>
                     

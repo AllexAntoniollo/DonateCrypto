@@ -39,7 +39,8 @@ describe("DonateCrypto", function () {
       const { contract} = await loadFixture(deployFixture);
 
       await contract.addCampaign(campaign.title,campaign.description,campaign.videosUrl,campaign.imagesUrl,campaign.goal)
-      const result = await contract.getCampaign(0)      
+      const result = await contract.getCampaign(0)    
+
       expect(await result.title).to.equal("Meal of Love");
     });
 

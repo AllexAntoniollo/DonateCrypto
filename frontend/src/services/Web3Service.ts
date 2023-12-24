@@ -67,7 +67,7 @@ export type Campaign = {
     description: string;
     videosUrl: string[];
     imagesUrl: string[];
-    goal: string;
+    goal: BigInt;
     author: string;
     balance: BigInt;
     donors: string[];
