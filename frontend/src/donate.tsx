@@ -1,15 +1,33 @@
 import { ethers } from "ethers";
 import Footer from "./components/Footer"
 import { Campaign, getCampaign, donate } from './services/Web3Service';
-
-
 import { useState } from "react"
+import Confetti from 'react-confetti'
+
 export default function Donate(){
 
     const [id,setId] = useState<number>();
     const [campaign,setCampaign] = useState<Campaign>({} as Campaign)
     const [donation,setDonation] = useState("");
     const [message,setMessage] = useState("");
+    const [confettiActive, setConfettiActive] = useState(false);
+    const [confettiOpacity, setConfettiOpacity] = useState(1); // Inicialmente, a opacidade é 1 (totalmente visível)
+
+
+
+    const confetti = () => {
+
+        return (
+            <Confetti
+                style={{position: "fixed", top:"0", left:"0", opacity: confettiOpacity}}
+                recycle={confettiActive}                
+                width={window.innerWidth}
+                height={window.innerHeight}
+            />
+            
+        )
+
+    }
 
     
 
@@ -24,10 +42,12 @@ export default function Donate(){
             await getCampaign(id)
             .then(result => {
                 setMessage("");                
-                setCampaign(result);      
+                setCampaign(result);     
+ 
                      
             })    
             .catch(err => setMessage(err.message));
+
         }
             
             
@@ -46,16 +66,31 @@ export default function Donate(){
 
         if (id !== undefined) {
             donate(id, donation)
-                .then(tx => setMessage("Doação realizada, obrigado. Em alguns minutos o saldo será atualizado."))
+                .then(tx => {setMessage("Doação realizada, obrigado. Em alguns minutos o saldo será atualizado.")
+                setConfettiActive(true);
+                let opacity = 1;
+                const interval = setInterval(() => {
+                    opacity -= 0.01; 
+                    setConfettiOpacity(opacity);
+
+                    if (opacity <= 0) {
+                        setConfettiActive(false);
+                        clearInterval(interval);
+                    }
+                }, 100);})
                 .catch(err => setMessage(err.message))
+
+
         } else {
             setMessage("ID da campanha não está definido. Certifique-se de buscar uma campanha antes de doar.");
         }
     }
-
     return(
         <>
+
             <div className="container">
+            {confettiActive && confetti()}
+
             <h1 className='display-5 fw-bold lh-1 mb-3 mt-3' style={{ color: "#333", fontFamily: "Euclid Circular B, sans-serif" }}>Donate Crypto</h1>
 
             {
@@ -64,6 +99,7 @@ export default function Donate(){
                     <>
 
                     <p className="mb-5">What is the campaign ID you are looking for?
+   
 </p>
                     <div className="col-3">
                         <div className="input-group mb-3">
@@ -133,6 +169,7 @@ export default function Donate(){
                         </div>
                         <div className="mb-3">
                             <div className="input-group">
+
                                 <input disabled={!campaign.active} type="number" id="donation" className="form-control" onChange={onChangeValue} value={donation}/>
                                 <span className="input-group-text">ETH</span>
                                 <input disabled={!campaign.active} type="button" value="Donate" className="btn btn-primary p-3 w-25" onClick={btnDonateClick}/>
@@ -148,8 +185,10 @@ export default function Donate(){
                     ? <div className="alert alert-success p-3 col-6" role="alert">{message}</div>
                     :<></>
                 }
+
                 <Footer></Footer>
             </div>
+
         </>
     )
 }
