@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
-import Footer from "./components/Footer"
-import { Campaign, getCampaign, donate } from './services/Web3Service';
+import Footer from "../components/Footer"
+import { Campaign, getCampaign, donate } from '../services/Web3Service';
 import { useState } from "react"
 import Confetti from 'react-confetti'
 
@@ -35,7 +35,7 @@ export default function Donate(){
       
 
     async function btnSearchClick() {
-        setMessage("Buscando...Aguarde...");
+        setMessage("Searching...wait...");
 
         if(id !== null && id !== undefined){
             
@@ -62,11 +62,11 @@ export default function Donate(){
     }
     
     function btnDonateClick() {
-        setMessage("Doando...Aguarde...");
+        setMessage("Donating...wait...");
 
         if (id !== undefined) {
             donate(id, donation)
-                .then(tx => {setMessage("Doação realizada, obrigado. Em alguns minutos o saldo será atualizado.")
+                .then(tx => {setMessage("The donation was made successfully, thanks. In some minutes the campaign balance will be increased.")
                 setConfettiActive(true);
                 let opacity = 1;
                 const interval = setInterval(() => {
@@ -82,7 +82,7 @@ export default function Donate(){
 
 
         } else {
-            setMessage("ID da campanha não está definido. Certifique-se de buscar uma campanha antes de doar.");
+            setMessage("Capaign id is undefined. Make sure you search for the correct campaign before donating.");
         }
     }
     return(
@@ -113,7 +113,7 @@ export default function Donate(){
                 :(
                     <>
 
-                    <p>Verifique se esta é a campanha certa antes de finalizar a doação.</p>
+                    <p>Please make sure this is the correct campaign before donating.</p>
                     <hr />
                     <div className="row flex-lg-row-reverse align-items-center g-5">
                         <div className="col-5">
@@ -152,7 +152,8 @@ export default function Donate(){
                             <p className="mb-3">Active: {campaign.active ? "This campaign is active." : "This campaign is closed."}</p>
 
 
-                            <p className="mb-3 fst-italic mt-5">E aí, o que achou do projeto? Já foi arrecadado {ethers.formatEther(campaign.balance)} ETH nesta campanha. O quanto você quer doar (em ETH)?</p>
+                            <p className="mb-3 fst-italic mt-5">
+So, what did you think of the project? Has already been collected {ethers.formatEther(campaign.balance)} ETH in this campaign. How much do you want to donate (in ETH)?</p>
 
                             <p className="mb-3">Donors: {campaign.donors
                                                         ? <>

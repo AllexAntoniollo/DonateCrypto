@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import Footer from "./components/Footer"
-import { Campaign, addCampaign, getLastCampaignId } from './services/Web3Service';
+import Footer from "../components/Footer"
+import { Campaign, addCampaign, getLastCampaignId } from '../services/Web3Service';
 import { ChangeEvent } from 'react';
 import { useState } from "react"
 import { ethers } from "ethers";

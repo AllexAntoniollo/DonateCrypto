@@ -1,7 +1,7 @@
 import { Route, BrowserRouter, Routes, Navigate } from 'react-router-dom';
-import Home from './Home';
-import Donate from './donate';
-import Create from './create';
+import Home from './pages/Home';
+import Donate from './pages/donate';
+import Create from './pages/create';
 
 function Router() {
 
